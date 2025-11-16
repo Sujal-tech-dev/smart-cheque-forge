@@ -23,6 +23,8 @@ const LayoutEditor = () => {
     amountWordsY: 215,
     dateX: 940,
     dateY: 65,
+    acPayeeX: 110,
+    acPayeeY: 80,
   });
 
   useEffect(() => {
@@ -45,7 +47,12 @@ const LayoutEditor = () => {
         amountWordsY: layout.amountWordsY,
         dateX: layout.dateX,
         dateY: layout.dateY,
+        acPayeeX: layout.acPayeeX,
+        acPayeeY: layout.acPayeeY,
       });
+      if (layout.backgroundImage) {
+        setBackgroundImage(layout.backgroundImage);
+      }
     }
   };
 
@@ -71,6 +78,7 @@ const LayoutEditor = () => {
         id: id || crypto.randomUUID(),
         name: layoutName,
         ...coordinates,
+        backgroundImage: backgroundImage || undefined,
       };
 
       await saveLayout(layout);
@@ -262,6 +270,30 @@ const LayoutEditor = () => {
                       type="number"
                       value={coordinates.dateY}
                       onChange={(e) => setCoordinates({ ...coordinates, dateY: Number(e.target.value) })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-semibold">A/C Payee Position</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="acPayeeX">X (pixels)</Label>
+                    <Input
+                      id="acPayeeX"
+                      type="number"
+                      value={coordinates.acPayeeX}
+                      onChange={(e) => setCoordinates({ ...coordinates, acPayeeX: Number(e.target.value) })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="acPayeeY">Y (pixels)</Label>
+                    <Input
+                      id="acPayeeY"
+                      type="number"
+                      value={coordinates.acPayeeY}
+                      onChange={(e) => setCoordinates({ ...coordinates, acPayeeY: Number(e.target.value) })}
                     />
                   </div>
                 </div>

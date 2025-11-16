@@ -66,7 +66,7 @@ const History = () => {
         toast.error('Layout not found');
         return;
       }
-      await downloadChequePDF(cheque, layout);
+      await downloadChequePDF(cheque, layout, layout.backgroundImage);
       toast.success('Cheque downloaded!');
     } catch (error) {
       console.error('Failed to download cheque:', error);
@@ -82,7 +82,7 @@ const History = () => {
         toast.error('Layout not found');
         return;
       }
-      await printCheque(cheque, layout);
+      await printCheque(cheque, layout, layout.backgroundImage);
     } catch (error) {
       console.error('Failed to print cheque:', error);
       toast.error('Failed to print cheque');
