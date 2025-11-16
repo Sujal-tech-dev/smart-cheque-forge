@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import NewCheque from "./pages/NewCheque";
 import History from "./pages/History";
 import Layouts from "./pages/Layouts";
+import LayoutEditor from "./pages/LayoutEditor";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -25,6 +26,8 @@ const App = () => (
           <Route path="/new-cheque" element={<NewCheque />} />
           <Route path="/history" element={<History />} />
           <Route path="/layouts" element={<Layouts />} />
+          <Route path="/layouts/new" element={<LayoutEditor />} />
+          <Route path="/layouts/edit/:id" element={<LayoutEditor />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

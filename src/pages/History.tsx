@@ -3,9 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Navigation } from '@/components/Navigation';
-import { getCheques, deleteCheque, ChequeRecord } from '@/lib/storage';
+import { getCheques, deleteCheque, ChequeRecord, getLayouts } from '@/lib/storage';
+import { downloadChequePDF, printCheque } from '@/lib/pdfGenerator';
 import { toast } from 'sonner';
-import { Search, Trash2, Calendar, Building2, IndianRupee } from 'lucide-react';
+import { Search, Trash2, Calendar, Building2, IndianRupee, Download, Printer } from 'lucide-react';
 import { format } from 'date-fns';
 
 const History = () => {
@@ -54,6 +55,37 @@ const History = () => {
     } catch (error) {
       console.error('Failed to delete cheque:', error);
       toast.error('Failed to delete cheque');
+    }
+  };
+
+  const handleDownload = async (cheque: ChequeRecord) => {
+    try {
+      const layouts = await getLayouts();
+      const layout = layouts.find(l => l.id === cheque.layoutId);
+      if (!layout) {
+        toast.error('Layout not found');
+        return;
+      }
+      await downloadChequePDF(cheque, layout);
+      toast.success('Cheque downloaded!');
+    } catch (error) {
+      console.error('Failed to download cheque:', error);
+      toast.error('Failed to download cheque');
+    }
+  };
+
+  const handlePrint = async (cheque: ChequeRecord) => {
+    try {
+      const layouts = await getLayouts();
+      const layout = layouts.find(l => l.id === cheque.layoutId);
+      if (!layout) {
+        toast.error('Layout not found');
+        return;
+      }
+      await printCheque(cheque, layout);
+    } catch (error) {
+      console.error('Failed to print cheque:', error);
+      toast.error('Failed to print cheque');
     }
   };
 
@@ -121,18 +153,47 @@ const History = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 text-2xl font-bold text-primary">
-                        <IndianRupee className="w-6 h-6" />
-                        {cheque.amount.toLocaleString('en-IN')}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 text-2xl font-bold text-primary">
+                          <IndianRupee className="w-6 h-6" />
+                          {cheque.amount.toLocaleString('en-IN')}
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {cheque.amountWords}
+                        </p>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {cheque.amountWords}
-                      </p>
+                      <div className="text-xs text-muted-foreground">
+                        Created {format(new Date(cheque.createdAt), 'dd MMM yyyy, HH:mm')}
+                      </div>
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      Created {format(new Date(cheque.createdAt), 'dd MMM yyyy, HH:mm')}
+                    
+                    <div className="flex gap-2 flex-wrap">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDownload(cheque)}
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Download PDF
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePrint(cheque)}
+                      >
+                        <Printer className="w-4 h-4 mr-2" />
+                        Print
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDelete(cheque.id)}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete
+                      </Button>
                     </div>
                   </div>
                 </CardContent>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Navigation } from '@/components/Navigation';
@@ -7,6 +8,7 @@ import { toast } from 'sonner';
 import { Layout, Trash2, Plus, Edit } from 'lucide-react';
 
 const Layouts = () => {
+  const navigate = useNavigate();
   const [layouts, setLayouts] = useState<ChequeLayout[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -50,7 +52,10 @@ const Layouts = () => {
             <h1 className="text-3xl font-bold mb-2">Cheque Layouts</h1>
             <p className="text-muted-foreground">Manage positioning for different bank cheques</p>
           </div>
-          <Button className="gap-2">
+          <Button 
+            className="gap-2"
+            onClick={() => navigate('/layouts/new')}
+          >
             <Plus className="w-4 h-4" />
             New Layout
           </Button>
@@ -81,6 +86,7 @@ const Layouts = () => {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
+                        onClick={() => navigate(`/layouts/edit/${layout.id}`)}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
