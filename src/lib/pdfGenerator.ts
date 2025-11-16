@@ -30,27 +30,30 @@ export async function generateChequePDF(
   doc.setFontSize(10);
   doc.setTextColor(0, 0, 0);
 
-  // Format date as DD/MM/YYYY
+  // Format date as spaced digits: D D M M Y Y Y Y
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+    return `${day}${month}${year}`.split('').join(' ');
   };
 
   // Add cheque details using layout coordinates
-  // Payee Name
-  doc.text(cheque.payeeName, pxToMm(layout.payeeX), pxToMm(layout.payeeY));
+  // Payee Name with ** markers
+  doc.text(`**${cheque.payeeName}**`, pxToMm(layout.payeeX), pxToMm(layout.payeeY));
 
-  // Amount in Words
-  doc.text(cheque.amountWords, pxToMm(layout.amountWordsX), pxToMm(layout.amountWordsY));
+  // Amount in Words with ** markers
+  doc.text(`**${cheque.amountWords}**`, pxToMm(layout.amountWordsX), pxToMm(layout.amountWordsY));
 
   // Amount in Numbers
   doc.text(`₹ ${cheque.amount.toFixed(2)}`, pxToMm(layout.amountX), pxToMm(layout.amountY));
 
-  // Date
+  // Date (spaced digits)
   doc.text(formatDate(cheque.date), pxToMm(layout.dateX), pxToMm(layout.dateY));
+
+  // A/C Payee Only
+  doc.text('A/C PAYEE ONLY', pxToMm(layout.acPayeeX), pxToMm(layout.acPayeeY));
 
   return doc;
 }

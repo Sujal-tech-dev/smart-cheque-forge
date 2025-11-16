@@ -22,6 +22,9 @@ export interface ChequeLayout {
   amountWordsY: number;
   dateX: number;
   dateY: number;
+  acPayeeX: number;
+  acPayeeY: number;
+  backgroundImage?: string;
 }
 
 const DB_NAME = 'ChequePrinterDB';
@@ -159,6 +162,8 @@ export async function initializeDefaultLayouts(): Promise<void> {
       amountWordsY: 45,
       dateX: 155,
       dateY: 15,
+      acPayeeX: 110,
+      acPayeeY: 80,
     },
     {
       id: 'hdfc',
@@ -171,6 +176,8 @@ export async function initializeDefaultLayouts(): Promise<void> {
       amountWordsY: 215,
       dateX: 940,
       dateY: 65,
+      acPayeeX: 110,
+      acPayeeY: 80,
     },
     {
       id: 'icici',
@@ -183,6 +190,8 @@ export async function initializeDefaultLayouts(): Promise<void> {
       amountWordsY: 46,
       dateX: 158,
       dateY: 16,
+      acPayeeX: 110,
+      acPayeeY: 80,
     },
   ];
   

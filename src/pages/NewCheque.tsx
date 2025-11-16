@@ -6,14 +6,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Navigation } from '@/components/Navigation';
+import { ChequePreview } from '@/components/ChequePreview';
 import { saveCheque, getLayouts, ChequeLayout, initializeDefaultLayouts } from '@/lib/storage';
 import { amountToWords } from '@/lib/amountToWords';
+import { downloadChequePDF, printCheque } from '@/lib/pdfGenerator';
 import { toast } from 'sonner';
-import { Printer } from 'lucide-react';
+import { Printer, Download, Eye } from 'lucide-react';
 
 const NewCheque = () => {
   const navigate = useNavigate();
   const [layouts, setLayouts] = useState<ChequeLayout[]>([]);
+  const [showPreview, setShowPreview] = useState(false);
   const [formData, setFormData] = useState({
     payeeName: '',
     amount: '',
@@ -81,6 +84,83 @@ const NewCheque = () => {
       toast.error('Failed to save cheque');
     }
   };
+
+  const handleDownload = async () => {
+    if (!formData.payeeName || !formData.amount || !formData.layoutId) {
+      toast.error('Please fill all required fields');
+      return;
+    }
+
+    const amount = parseFloat(formData.amount);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+
+    try {
+      const selectedLayout = layouts.find(l => l.id === formData.layoutId);
+      if (!selectedLayout) {
+        toast.error('Layout not found');
+        return;
+      }
+
+      const cheque = {
+        id: crypto.randomUUID(),
+        payeeName: formData.payeeName,
+        amount,
+        amountWords: amountInWords,
+        date: formData.date,
+        bank: selectedLayout.name,
+        layoutId: formData.layoutId,
+        createdAt: new Date().toISOString(),
+      };
+
+      await downloadChequePDF(cheque, selectedLayout, selectedLayout.backgroundImage);
+      toast.success('Cheque downloaded!');
+    } catch (error) {
+      console.error('Failed to download:', error);
+      toast.error('Failed to download cheque');
+    }
+  };
+
+  const handlePrint = async () => {
+    if (!formData.payeeName || !formData.amount || !formData.layoutId) {
+      toast.error('Please fill all required fields');
+      return;
+    }
+
+    const amount = parseFloat(formData.amount);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+
+    try {
+      const selectedLayout = layouts.find(l => l.id === formData.layoutId);
+      if (!selectedLayout) {
+        toast.error('Layout not found');
+        return;
+      }
+
+      const cheque = {
+        id: crypto.randomUUID(),
+        payeeName: formData.payeeName,
+        amount,
+        amountWords: amountInWords,
+        date: formData.date,
+        bank: selectedLayout.name,
+        layoutId: formData.layoutId,
+        createdAt: new Date().toISOString(),
+      };
+
+      await printCheque(cheque, selectedLayout, selectedLayout.backgroundImage);
+    } catch (error) {
+      console.error('Failed to print:', error);
+      toast.error('Failed to print cheque');
+    }
+  };
+
+  const selectedLayout = layouts.find(l => l.id === formData.layoutId);
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-4 md:pt-20">
@@ -156,10 +236,55 @@ const NewCheque = () => {
                 </Select>
               </div>
 
-              <div className="flex gap-4 pt-4">
-                <Button type="submit" className="flex-1">
-                  Save & Generate PDF
+              {showPreview && selectedLayout && (
+                <div className="space-y-2">
+                  <Label>Preview</Label>
+                  <ChequePreview
+                    payeeName={formData.payeeName}
+                    amount={formData.amount}
+                    amountWords={amountInWords}
+                    date={formData.date}
+                    layout={selectedLayout}
+                  />
+                </div>
+              )}
+
+              <div className="flex gap-4 pt-4 flex-wrap">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowPreview(!showPreview)}
+                  className="flex items-center gap-2"
+                >
+                  <Eye className="w-4 h-4" />
+                  {showPreview ? 'Hide Preview' : 'Show Preview'}
                 </Button>
+
+                <Button type="submit" className="flex-1">
+                  <Printer className="w-4 h-4 mr-2" />
+                  Save Cheque
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleDownload}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Download PDF
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handlePrint}
+                  className="flex items-center gap-2"
+                >
+                  <Printer className="w-4 h-4" />
+                  Print
+                </Button>
+
                 <Button 
                   type="button" 
                   variant="outline"
